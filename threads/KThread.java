@@ -228,8 +228,26 @@ public class KThread implements Comparable<KThread> {
         int topCount = 0;
 	currentThread.ready();
         currentThread.counter = currentThread.counter+1;
-        if (currentThread.counter % 5  == 0)
+        if (currentThread.counter % 5  == 0) {
             currentThread.setPriority(currentThread.getPriority()-2);
+	  if (currentThread.priority == 0) {
+	    currentThread.sleep();
+            Random rand = new Random();
+            int num = rand.nextInt();
+            if (num < 0)
+                num *= -1;
+            for (int i = 0; i < 7; ++i) {
+                int randPriority = rand.nextInt();
+		randPriority = randPriority % 7;
+                if (randPriority < 0)
+                    randPriority *= -1;
+                String name = Integer.toString(i + 7);
+                spawnThread(name, randPriority);
+        
+	     }
+          }
+
+	}	
 	runNextThread();
 	
 	Machine.interrupt().restore(intStatus);
@@ -407,6 +425,7 @@ public class KThread implements Comparable<KThread> {
 	private int which;
     }
 
+
     /**
      * Tests whether this module is working.
      */
@@ -418,17 +437,17 @@ public class KThread implements Comparable<KThread> {
             num *= -1;
         for (int i = 0; i < 7; ++i) {
             int randPriority = rand.nextInt();
-            randPriority = randPriority % 7;
+	    randPriority = randPriority % 7;
             if (randPriority < 0)
                 randPriority *= -1;
             String name = Integer.toString(i);
             spawnThread(name, randPriority);
         
+	}
   
-        }
     }
 
-    public static void spawnThread (String name, int priority) {
+     public static void spawnThread (String name, int priority) {
 	KThread thread = new KThread(new PingTest());
         thread.setName(name);
         thread.setPriority(priority);

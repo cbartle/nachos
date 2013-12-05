@@ -102,11 +102,11 @@ public class PriorityScheduler extends Scheduler {
     /**
      * The default priority for a new thread. Do not change this value.
      */
-    public static final int priorityDefault = 1;
+    public static final int priorityDefault = 3;
     /**
      * The minimum priority that a thread can have. Do not change this value.
      */
-    public static final int priorityMinimum = 0;
+    public static final int priorityMinimum = 1;
     /**
      * The maximum priority that a thread can have. Do not change this value.
      */
@@ -170,9 +170,10 @@ public class PriorityScheduler extends Scheduler {
 	    return waitQueue.peek();
 	}
     
-        public void add(KThread thread) {
-            this.waitQueue.add(thread);
-        }
+        public void add(KThread thread) {	
+            this.waitQueue.addFirst(thread);
+       	    Collections.sort(waitQueue);
+	 }
 
         public boolean isEmpty() {
             return this.waitQueue.isEmpty();
@@ -261,7 +262,8 @@ public class PriorityScheduler extends Scheduler {
 
         public ThreadState getThreadState() {
             return this;
-        }
+       }
+
 
 	/**
 	 * Called when <tt>waitForAccess(thread)</tt> (where <tt>thread</tt> is
