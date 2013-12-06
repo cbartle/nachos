@@ -1,5 +1,6 @@
 package nachos.threads;
 import java.util.Random;
+import java.util.Collections;
 import nachos.machine.*;
 
 /**
@@ -401,17 +402,19 @@ public class KThread implements Comparable<KThread> {
 	
 	public void run() {
                     for (int i = 0; i < readyQueue.size(); i++) {
-                        System.out.println(readyQueue.get(i).getName() + " " + readyQueue.get(i).getPriority() + " jobLength: " + readyQueue.get(i).jobLength);
+                        System.out.println(readyQueue.get(i).getName() + " " + readyQueue.get(i).getPriority() + " Remaining jobLength: " + (readyQueue.get(i).jobLength - currentThread.counter));
                     }
             while (true) {
 		    System.out.println("*** thread " + currentThread.getName() + " looped "
-				       + currentThread.counter + " times priority: " + currentThread.getPriority() + " jobLength " + currentThread.jobLength);
-		    currentThread.yield(); 
+				       + currentThread.counter + " times priority: " + currentThread.getPriority() + " Remaining jobLength " + (currentThread.jobLength - currentThread.counter));
+		   // currentThread.yield(); 
 		if (currentThread.counter == currentThread.jobLength){ 
-		    currentThread.spawnThread(currentThread.getName() + " new ", 0);
+		    currentThread.spawnThread(currentThread.getName() + " new ", Math.abs(new Random().nextInt() % 7));
+		    currentThread.yield(); 
 		    currentThread.finish();
-                    
 		}
+                else 
+		    currentThread.yield();
             }
 	}
 
@@ -490,7 +493,7 @@ public class KThread implements Comparable<KThread> {
     private int id = numCreated++;
     /** Number of times the KThread constructor was called. */
     private static int numCreated = 0;
-    public int jobLength =Math.abs(new Random().nextInt() % 28) + 1;  
+    public int jobLength =Math.abs(new Random().nextInt() % 49) + 1;  
     public int counter = 0;
     private int priority = 0;
     private static ThreadQueue readyQueue = null;
