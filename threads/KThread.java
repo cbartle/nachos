@@ -225,32 +225,17 @@ public class KThread implements Comparable<KThread> {
 	Lib.assertTrue(currentThread.status == statusRunning);
 	
 	boolean intStatus = Machine.interrupt().disable();
-        int topCount = 0;
 	currentThread.ready();
         currentThread.counter = currentThread.counter+1;
        	String name = Integer.toString(7);
-	if (currentThread.counter % 5  == 0) {
+	if (currentThread.counter % 5  == 0) 
             currentThread.setPriority(currentThread.getPriority()-2);
-	  if (currentThread.priority == 0) {
-	    currentThread.sleep();
-            Random rand = new Random();
-            int num = rand.nextInt();
-            if (num < 0)
-                num *= -1;
-            int randPriority = rand.nextInt(); 
-	    for (int i = 0; i < 7; ++i) {
-                randPriority = rand.nextInt();
-		randPriority = randPriority % 7;
-                if (randPriority < 0)
-                    randPriority *= -1;
-                name = Integer.toString(i + 7);
-            }
-	    spawnThread(name, randPriority);
-        
-	     
-          }
+	if (currentThread.getPriority() < 0)
+	    currentThread.setPriority(0); 
 
-	}	
+	     
+
+		
 	runNextThread();
 	
 	Machine.interrupt().restore(intStatus);
@@ -415,13 +400,18 @@ public class KThread implements Comparable<KThread> {
 	}
 	
 	public void run() {
-                    for (int i = 0; i < 7; i++) {
-                        System.out.println(readyQueue.get(i).getName() + " " + readyQueue.get(i).getPriority());
+                    for (int i = 0; i < readyQueue.size(); i++) {
+                        System.out.println(readyQueue.get(i).getName() + " " + readyQueue.get(i).getPriority() + " jobLength: " + readyQueue.get(i).jobLength);
                     }
             while (true) {
 		    System.out.println("*** thread " + currentThread.getName() + " looped "
-				       + currentThread.counter + " times priority: " + currentThread.getPriority());
-		    currentThread.yield();
+				       + currentThread.counter + " times priority: " + currentThread.getPriority() + " jobLength " + currentThread.jobLength);
+		    currentThread.yield(); 
+		if (currentThread.counter == currentThread.jobLength){ 
+		    currentThread.spawnThread(currentThread.getName() + " new ", 0);
+		    currentThread.finish();
+                    
+		}
             }
 	}
 
@@ -443,6 +433,8 @@ public class KThread implements Comparable<KThread> {
 	    randPriority = randPriority % 7;
             if (randPriority < 0)
                 randPriority *= -1;
+	    if (randPriority == 0)
+		randPriority = 1;
             String name = Integer.toString(i);
             spawnThread(name, randPriority);
         
@@ -498,7 +490,7 @@ public class KThread implements Comparable<KThread> {
     private int id = numCreated++;
     /** Number of times the KThread constructor was called. */
     private static int numCreated = 0;
-   
+    public int jobLength =Math.abs(new Random().nextInt() % 28) + 1;  
     public int counter = 0;
     private int priority = 0;
     private static ThreadQueue readyQueue = null;

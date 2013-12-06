@@ -149,8 +149,13 @@ public class PriorityScheduler extends Scheduler {
 
             if (this.waitQueue.isEmpty())
                 return null;
-
-            KThread nextThread = this.pickNextThread();
+	   /* Machine.interrupt().disable();
+            for (int i = 0; i < waitQueue.size(); ++i){
+                if (this.pickNextThread().counter == this.pickNextThread().jobLength)
+                    this.pickNextThread().finish();
+	    }
+		Machine.interrupt().enable();
+            */KThread nextThread = this.pickNextThread();
             waitQueue.remove(this.pickNextThread());
 
 	    return (nextThread);
@@ -171,8 +176,12 @@ public class PriorityScheduler extends Scheduler {
 	}
     
         public void add(KThread thread) {	
+	    if (thread.getPriority() > 0)
             this.waitQueue.addFirst(thread);
+	    else if (thread.getPriority() == 0)
+	    this.waitQueue.addLast(thread);
        	    Collections.sort(waitQueue);
+
 	 }
 
         public boolean isEmpty() {
